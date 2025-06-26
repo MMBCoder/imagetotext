@@ -1,37 +1,42 @@
 import streamlit as st
 import easyocr
 import numpy as np
-from PIL import Image
 import cv2
+from PIL import Image, ImageOps
 
-# Initialize EasyOCR reader (English as default language)
-reader = easyocr.Reader(['en'])
+# Initialize the OCR reader once
+@st.cache_resource
+def load_reader():
+    return easyocr.Reader(['en'], gpu=False)  # Use GPU=True if available
 
-# Streamlit UI
-st.title("Image to Text Extraction")
+reader = load_reader()
 
-uploaded_image = st.file_uploader("Upload an image (JPG, JPEG, PNG)", type=["jpg", "jpeg", "png"])
+# Title
+st.title("📟 Advanced Image to Text Converter")
 
-if uploaded_image is not None:
-    # Display uploaded image
-    image = Image.open(uploaded_image)
-    st.image(image, caption="Uploaded Image", use_column_width=True)
+# Upload section
+uploaded_file = st.file_uploader("Upload an image (JPG, JPEG, PNG)", type=["jpg", "jpeg", "png"])
 
-    # Convert image to numpy array
-    img_array = np.array(image)
+if uploaded_file:
+    image = Image.open(uploaded_file).convert("RGB")
+    st.image(image, caption="📷 Uploaded Image", use_column_width=True)
 
-    # Convert RGB to BGR format for OpenCV
-    if len(img_array.shape) == 3:
-        img_array = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
+    # Preprocess image
+    img_np = np.array(image)
+    gray = cv2.cvtColor(img_np, cv2.COLOR_RGB2GRAY)
+    gray = cv2.bilateralFilter(gray, 9, 75, 75)  # Remove noise
+    thresh = cv2.adaptiveThreshold(
+        gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2
+    )
 
-    # Perform OCR to extract text
-    with st.spinner("Extracting text..."):
-        results = reader.readtext(img_array, detail=0, paragraph=True)
+    # Perform OCR
+    with st.spinner("🔍 Extracting text..."):
+        result = reader.readtext(thresh, detail=0, paragraph=True)
 
-    # Display extracted text
-    st.subheader("Extracted Text")
-    if results:
-        extracted_text = "\n".join(results)
-        st.write(extracted_text)
+    # Display results
+    st.subheader("📄 Extracted Text:")
+    if result:
+        full_text = "\n".join(result)
+        st.text_area("Output", full_text, height=400)
     else:
-        st.write("No text detected!")
+        st.warning("No text found in the image.")
