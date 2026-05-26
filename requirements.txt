@@ -1,0 +1,16 @@
+streamlit
+openai
+langgraph
+langchain
+langchain-openai
+tavily-python
+yfinance
+pandas
+numpy
+plotly
+prophet
+python-dotenv
+faiss-cpu
+textblob
+scikit-learn
+matplotlib
