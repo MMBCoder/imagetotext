@@ -1,10 +1,18 @@
-import os
 from openai import OpenAI
 
-client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
+def summarize_report(
+    company,
+    market,
+    finance,
+    sentiment,
+    recommendations,
+    openai_api_key,
+    model_name,
+):
 
-def summarize_report(company, market, finance, sentiment, recommendations):
+    client = OpenAI(api_key=openai_api_key)
+
     prompt = f'''
     Prepare a detailed FMCG sales meeting preparation summary.
 
@@ -24,7 +32,7 @@ def summarize_report(company, market, finance, sentiment, recommendations):
     '''
 
     response = client.chat.completions.create(
-        model=os.getenv('MODEL_NAME', 'gpt-5'),
+        model=model_name,
         messages=[
             {
                 'role': 'system',
