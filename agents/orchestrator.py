@@ -5,9 +5,18 @@ from agents.recommendation_agent import generate_recommendations
 from services.llm_service import summarize_report
 
 
-def run_sales_meeting_prep(company, competitor):
-    market_data = research_company(company)
+def run_sales_meeting_prep(
+    company,
+    competitor,
+    openai_api_key,
+    tavily_api_key,
+    model_name,
+):
+
+    market_data = research_company(company, tavily_api_key)
+
     finance_data = analyze_finance(competitor)
+
     sentiment_data = analyze_sentiment(company)
 
     recommendations = generate_recommendations(
@@ -22,6 +31,8 @@ def run_sales_meeting_prep(company, competitor):
         finance_data,
         sentiment_data,
         recommendations,
+        openai_api_key,
+        model_name,
     )
 
     return {
