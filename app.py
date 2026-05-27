@@ -1,9 +1,9 @@
 import streamlit as st
 from agents.orchestrator import run_sales_meeting_prep
 
-st.set_page_config(page_title='AI Sales Copilot', layout='wide')
+st.set_page_config(page_title='SalesPrep', layout='wide')
 
-st.title('AI Multi-Agent Sales Copilot')
+st.title('SalesPrep')
 st.markdown('Prepare FMCG sales representatives before customer meetings using AI insights.')
 
 st.sidebar.header('API Configuration')
